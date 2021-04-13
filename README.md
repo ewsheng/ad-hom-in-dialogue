@@ -11,8 +11,27 @@ See the original paper for more category details.
 
 To comply with Twitter's [Terms of Service](https://developer.twitter.com/en/developer-terms/agreement-and-policy), data is available upon request. Please contact Emily at ewsheng at isi dot edu.
 
+## Setup
+```
+conda create --name ad-hominems python==3.7
+conda activate ad-hominems
+pip install -r requirements.txt
+```
+
 ## Ad Hominem Classifier
-Coming soon
+To run the trained ad hominem classifier, first download the model here: [coming soon].
+
+Then use the following command:
+```
+python run_adhom_classifier.py \
+--data_dir [PATH-TO-DATA-DIR] \
+--test_file [TEST-FILE] \
+--model_type bert \
+--model_name_or_path adhom_model \
+--output_dir output \
+--do_predict \
+--do_lower_case
+```
 
 ## Constrained Decoding: SalienSimTop-k
 Coming soon

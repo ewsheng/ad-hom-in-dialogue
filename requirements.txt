@@ -1,0 +1,9 @@
+transformers==4.4.2
+torch==1.8.1
+seqeval==1.2.2
+ngram==3.3.2
+tqdm==4.60.0
+numpy==1.20.2
+matplotlib==3.4.1
+sklearn==0.0
+tensorboardX==2.2.0
