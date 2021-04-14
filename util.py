@@ -7,12 +7,6 @@ import os
 import re
 import string
 
-# import matplotlib  TODO: are these necessary for tsne
-# matplotlib.use('TkAgg')
-import matplotlib.lines as mlines
-import matplotlib.pyplot as plt
-from sklearn.manifold import TSNE
-
 logger = logging.getLogger(__name__)
 
 
@@ -249,11 +243,12 @@ def trim_text(text):
 			return text[:max_end_idx + 1]
 
 
-def clean_text(text):
+def clean_text(text, is_tweet=False):
 	"""Clean text to calculate salient ngrams."""
 	text = text.lower()
 	text = text.encode('ascii', 'ignore').decode()
-	text = clean_tweet(text)
+	if is_tweet:
+		text = clean_tweet(text)
 	for p in string.punctuation:  # Remove punctuation.
 		if p in "'<>|":
 			continue
@@ -284,33 +279,34 @@ def _mod_pattern(pattern, replace, input_txt):
 	"""Find all instances of pattern and possibly replace."""
 	r = re.findall(pattern, input_txt)
 	for i in r:
-		input_txt = re.sub(i, replace, input_txt)
+		input_txt = re.sub(re.escape(i), replace, input_txt)
 	return input_txt
 
 
 def _filter_retweets(text):
-	pattern = r'RT @[\w]*:'
+	pattern = r"RT @[\w]*:"
 	text = _mod_pattern(pattern, '', text)
 	text = text.replace('  ', ' ').strip()
 	return text
 
 
 def _filter_urls(text):
-	pattern = r'https?://[A-Za-z0-9./]*'
+	pattern = r"https?://[A-Za-z0-9./]*"
 	text = _mod_pattern(pattern, '', text)
 	text = text.replace('  ', ' ').strip()
 	return text
 
 
+# https://stackoverflow.com/questions/2304632/regex-for-twitter-username
 def _filter_usernames(text):
-	pattern = r'(?<=^|(?<=[^a-zA-Z0-9-\.]))@([A-Za-z0-9_]+)'
+	pattern = r"(?<=^|(?<=[^a-zA-Z0-9-_\.]))@([A-Za-z]+[A-Za-z0-9-_]+)"
 	text = _mod_pattern(pattern, '', text)
 	text = text.replace('  ', ' ').strip()
 	return text
 
 
 def _filter_emails(text):
-	pattern = r'\S+@\S+'
+	pattern = r"\S+@\S+"
 	text = _mod_pattern(pattern, '', text)
 	text = text.replace('  ', ' ').strip()
 	return text
@@ -318,76 +314,7 @@ def _filter_emails(text):
 
 def _filter_hashtags(text):
 	"""Replace all hashtags with #[hashtag]."""
-	pattern = r'#[\w]+'
+	pattern = r"#[\w]+"
 	text = _mod_pattern(pattern, '', text)
 	text = text.replace('  ', ' ').strip()
 	return text
-
-
-def plot_ngrams(person_to_category_to_salient_ngram_embed):
-	"""Plot tSNE plot of salient ngram embeddings."""
-	lr = 100.0
-
-	adhom_ngrams = person_to_category_to_salient_ngram_embed['personb']['1']
-	non_adhom_ngrams = person_to_category_to_salient_ngram_embed['personb']['0']
-	adhom_tokens = [x[0] for x in adhom_ngrams]
-	adhom_salience = [float(x[2]) for x in adhom_ngrams]
-	adhom_embeds = [np.mean(x[1].detach().numpy(), axis=0) for x in adhom_ngrams]
-	non_adhom_tokens = [x[0] for x in non_adhom_ngrams]
-	non_adhom_salience = [float(x[2]) for x in non_adhom_ngrams]
-	non_adhom_embeds = [np.mean(x[1].detach().numpy(), axis=0) for x in non_adhom_ngrams]
-
-	tsne = TSNE(n_components=2,
-	            verbose=1,
-	            method='exact',
-	            learning_rate=lr)
-	tsne_results = tsne.fit_transform(adhom_embeds + non_adhom_embeds)
-	adhom_results = tsne_results[:len(adhom_embeds)]
-	non_adhom_results = tsne_results[len(adhom_embeds):]
-
-	adhom_x = adhom_results[:, 0]
-	adhom_y = adhom_results[:, 1]
-	non_adhom_x = non_adhom_results[:, 0]
-	non_adhom_y = non_adhom_results[:, 1]
-
-	# Ad hominems.
-	plt.scatter(adhom_x, adhom_y,
-	            c='blue',
-	            marker='.',
-	            s=60)
-
-	# Non-ad hominems.
-	plt.scatter(non_adhom_x, non_adhom_y,
-	            c='orange',
-	            marker='+',
-	            s=60)
-	plt.tick_params(
-		axis='both',
-		which='both',  # both major and minor ticks are affected
-		bottom=False,
-		left=False,  # ticks along the top edge are off
-		labelbottom=False,
-		labelleft=False)
-
-	for i, txt in enumerate(adhom_tokens):
-		if adhom_salience[i] > 11.0:  # Hard-coded threshold for label.
-			plt.annotate(txt, (adhom_x[i], adhom_y[i]))
-
-	for i, txt in enumerate(non_adhom_tokens):
-		if non_adhom_salience[i] > 6:  # Hard-coded threshold for label.
-			plt.annotate(txt, (non_adhom_x[i], non_adhom_y[i]))
-
-	jet_patch = mlines.Line2D([], [],
-	                          color='blue',
-	                          label='AH',
-	                          marker='.',
-	                          linestyle='',
-	                          markersize=10)
-	ocean_patch = mlines.Line2D([], [],
-	                            color='orange',
-	                            label='non-AH',
-	                            marker='+',
-	                            linestyle='',
-	                            markersize=10)
-	plt.legend(loc='upper right', handles=[jet_patch, ocean_patch])
-	plt.show()

@@ -34,4 +34,23 @@ python run_adhom_classifier.py \
 ```
 
 ## Constrained Decoding: SalienSimTop-k
-Coming soon
+To do standard dialogue generation without constrained decoding, you can run:
+```
+python generate_dialogue.py \
+--prompt_file [PROMPT_FILE] \
+--output_file [OUTPUT_FILE]
+```
+
+To apply constrained decoding:
+```
+python generate_dialogue.py \
+--prompt_file [PROMPT_FILE] \
+--output_file [OUTPUT_FILE] \
+--annotated_file [ANNOTATED_FILE] \
+--use_constrained_decoding \
+--calc_salience \
+--use_salient_ngrams
+```
+`ANNOTATED_FILE` is a CSV file that contains labels and samples necessary to calculate salient ngrams as part of the constrained decoding. A sample is included at `data/sample_annotated_file.csv`. 
+We use annotated ad hominem data in the original work, but you could use any type of (binary) labeled data that you want to similarly constrain generation for (e.g., reducing offensive/toxic language, microaggressions).
+Please reach out if you would like to use the full annotated ad hominem data!
