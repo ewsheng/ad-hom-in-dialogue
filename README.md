@@ -9,7 +9,7 @@ The full AdHomInTweets dataset consists 14.5K [post, response] English Tweet pai
 For the human-annotated samples, the labels specify whether the response is an ad hominem or not to the post, and if the former, whether the ad hominem type is *stupidity*, *ignorance*, *trolling/lying*, *bias*, *condescension*, or *other*. For the classifier-labeled samples, the labels are a binary categorization of whether the response has an ad hominem(s) to the post.
 See the original paper for more category details.
 
-To comply with Twitter's [Terms of Service](https://developer.twitter.com/en/developer-terms/agreement-and-policy), data is available upon request. Please contact Emily at ewsheng at isi dot edu.
+To comply with Twitter's [Terms of Service](https://developer.twitter.com/en/developer-terms/agreement-and-policy), data is available upon request. Please contact Emily at ewsheng at gmail.
 
 ## Setup
 ```
@@ -19,7 +19,7 @@ pip install -r requirements.txt
 ```
 
 ## Ad Hominem Classifier
-To run the trained ad hominem classifier, first download the model here: [coming soon].
+To run the trained ad hominem classifier, first download the model [here](https://drive.google.com/file/d/1z1njlrd4i12OAtpsrkML4dc0KZ3Ux4Ol/view?usp=sharing).
 
 Then use the following command:
 ```
