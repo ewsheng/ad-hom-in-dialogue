@@ -33,6 +33,8 @@ python run_adhom_classifier.py \
 --do_lower_case
 ```
 
+We expect this trained model to not be as useful outside the domains it was trained on, and suggest re-training for different domains.
+
 ## Constrained Decoding: SalienSimTop-k
 To do standard dialogue generation without constrained decoding, you can run:
 ```
